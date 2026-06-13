@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "EUPHORIA — A Night of House, Tech House & Techno",
+    "location": "alkaif Hotel Riyadh, Saudi Arabia",
+    "price": 150,
+    "currency": "SAR",
+    "datetime": "2026-06-26T22:00",
+    "description": "Start 10PM. Limited tickets. Join us for an unforgettable night of House, Tech House & Techno with world-class DJs, immersive lighting, and a state-of-the-art sound system. Doors open at 10PM — arrive early to secure your spot on the floor.",
+    "image": "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "id": "2",
+    "name": "Sunset Rooftop Jazz",
+    "location": "Dubai Marina, UAE",
+    "price": 150,
+    "currency": "SAR",
+    "datetime": "2026-07-10T19:30",
+    "description": "An intimate evening of live jazz on a rooftop overlooking the marina. Enjoy smooth saxophone, soulful vocals, and signature cocktails as the sun goes down. Limited seating for a cozy, premium experience.",
+    "image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "id": "3",
+    "name": "Tech Founders Networking Mixer",
+    "location": "Online & In-Person, Jeddah",
+    "price": 100,
+    "currency": "SAR",
+    "datetime": "2026-07-18T18:00",
+    "description": "Connect with founders, investors, and builders in the region's fastest-growing tech community. Lightning talks, structured networking, and free refreshments. Free to attend — registration required.",
+    "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "id": "1781371357531",
+    "name": "Nust AutoShow",
+    "location": "Nust , Islamabad",
+    "price": 120,
+    "currency": "SAR",
+    "datetime": "2026-08-02T11:00",
+    "description": "The NUST Auto Show is one of the largest student-led automotive exhibitions in Pakistan. It brings together car enthusiasts, automotive companies, and engineering students under one platform. The event showcases luxury cars, modified vehicles, motorcycles, and innovative automotive technologies. It promotes engineering excellence, creativity, and industry-academia collaboration. The Auto Show attracts thousands of visitors every year, making it a premier automotive event in the country.",
+    "image": "https://images.unsplash.com/photo-1589553939640-3a6b11675c92?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  }
+]
