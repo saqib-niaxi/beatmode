@@ -1,7 +1,7 @@
 {
-  "name": "its-beatsmode",
+  "name": "its-beast-mode",
   "version": "1.0.0",
-  "description": "ITs beatsmode — event booking site (Vercel-ready: Vite frontend + serverless API + Upstash Redis)",
+  "description": "ITS Beast Mode — event booking site (Vercel-ready: Vite frontend + serverless API + Upstash Redis)",
   "type": "module",
   "scripts": {
     "dev": "node --watch api/index.js",

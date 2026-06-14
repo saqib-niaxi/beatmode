@@ -1,4 +1,4 @@
-# ITs beatsmode — Event Booking Site
+# ITS Beast Mode — Event Booking Site
 
 Premium liquid-glass event booking site. Browse events, book with one tap →
 the visitor's WhatsApp opens with a pre-filled message to the owner.
@@ -51,7 +51,7 @@ Or manually at **console.upstash.com** → create a Redis DB → copy the
 cd I:\zami
 git init
 git add .
-git commit -m "ITs beatsmode"
+git commit -m "ITS Beast Mode"
 git branch -M main
 git remote add origin https://github.com/<you>/<repo>.git
 git push -u origin main

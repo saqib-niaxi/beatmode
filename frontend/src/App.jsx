@@ -35,9 +35,9 @@ function Layout({ children }) {
               className="h-14 w-14 rounded-xl bg-white/90 object-contain p-1 ring-1 ring-white/25"
             />
             <span>
-              ITs{' '}
+              ITS{' '}
               <span className="bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
-                beatsmode
+                Beast Mode
               </span>
             </span>
           </Link>
@@ -45,7 +45,7 @@ function Layout({ children }) {
       </header>
       <main className="relative z-10">{children}</main>
       <footer className="relative z-10 mt-20 border-t border-white/10 py-8 text-center text-sm text-slate-400">
-        ITs beatsmode — book your spot in seconds.
+        ITS Beast Mode — book your spot in seconds.
       </footer>
     </div>
   );
