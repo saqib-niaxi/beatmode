@@ -22,39 +22,38 @@ export function formatDateTime(datetime) {
   });
 }
 
+// Split "EUPHORIA — A Different Experience" into a bold title and a tagline.
+// Falls back to the location when there's no tagline.
+export function splitTitle(event) {
+  const parts = String(event.name || '').split(/[—–-]/);
+  const title = parts[0].trim();
+  const tagline = parts.slice(1).join('—').trim() || event.location || '';
+  return { title, tagline };
+}
+
 export default function EventCard({ event }) {
+  const { title, tagline } = splitTitle(event);
+
   return (
-    <Link
-      to={`/events/${event.id}`}
-      className="glass group flex flex-col overflow-hidden rounded-3xl shadow-xl transition duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-pink-500/15"
-    >
-      <div className="aspect-[16/10] overflow-hidden">
-        <img
-          src={event.image || PLACEHOLDER}
-          alt={event.name}
-          loading="lazy"
-          onError={(e) => {
-            e.currentTarget.src = PLACEHOLDER;
-          }}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-        />
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="line-clamp-2 font-semibold leading-snug text-white">{event.name}</h3>
-        <p className="mt-1 text-sm text-slate-400">{event.location}</p>
-        {event.datetime && (
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-pink-200/90">
-            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {formatDateTime(event.datetime)}
+    <Link to={`/events/${event.id}`} className="event-card group">
+      <img
+        src={event.image || PLACEHOLDER}
+        alt={event.name}
+        loading="lazy"
+        onError={(e) => {
+          e.currentTarget.src = PLACEHOLDER;
+        }}
+        className="event-card__img"
+      />
+      <div className="event-card__overlay">
+        <h3 className="text-3xl font-bold uppercase tracking-[0.18em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] sm:text-4xl">
+          {title}
+        </h3>
+        {tagline && (
+          <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/80">
+            {tagline}
           </p>
         )}
-        <div className="mt-auto pt-4">
-          <span className="inline-block rounded-full bg-gradient-to-r from-pink-500/20 to-orange-500/20 px-3 py-1 text-sm font-semibold text-pink-200 ring-1 ring-inset ring-pink-400/30">
-            {formatPrice(event.price, event.currency)}
-          </span>
-        </div>
       </div>
     </Link>
   );

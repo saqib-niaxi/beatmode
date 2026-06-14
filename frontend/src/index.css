@@ -1,48 +1,138 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #07060d;
-  color: #e5e7eb;
+  font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #000;
+  color: #fff;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---- Liquid-glass background orbs ---- */
-.orb {
-  position: fixed;
+/* The source logo is a black monogram on white — invert it so it reads as a
+   white mark on the black stage. */
+.logo-mark {
+  filter: invert(1);
+}
+
+/* ---------- Stacked squircle event cards (home) ---------- */
+.event-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 2rem;
+  overflow: hidden;
+  background: #0a0a0a;
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.95);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px -26px rgba(0, 0, 0, 1);
+}
+.event-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+.event-card:hover .event-card__img {
+  transform: scale(1.06);
+}
+.event-card__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.75rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ---------- Outlined glowing pill (BOOK NOW) ---------- */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 9999px;
-  filter: blur(90px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.02);
+  color: #fff;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 24px -2px rgba(255, 255, 255, 0.35),
+    inset 0 0 14px -8px rgba(255, 255, 255, 0.5);
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 34px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+.btn-outline:disabled {
   opacity: 0.5;
-  pointer-events: none;
+  box-shadow: none;
 }
 
-@keyframes drift {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(40px, -50px) scale(1.12);
-  }
-  66% {
-    transform: translate(-30px, 30px) scale(0.92);
-  }
+/* ---------- Solid white pill (SUBMIT / Done) ---------- */
+.btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-white:hover {
+  background: #e6e6e6;
+  transform: translateY(-1px);
+}
+.btn-white:disabled {
+  opacity: 0.5;
+  transform: none;
 }
 
-/* ---- Reusable frosted glass panel ---- */
+/* ---------- White pill text inputs (booking form) ---------- */
+.pill-input {
+  width: 100%;
+  border-radius: 9999px;
+  border: 2px solid #2b3344;
+  background: #fff;
+  color: #111;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pill-input::placeholder {
+  color: #9ca3af;
+}
+.pill-input:focus {
+  border-color: #6b7280;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- Shared dark utilities (kept for the Admin panel) ---------- */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-/* Inputs on glass surfaces */
 .glass-input {
   width: 100%;
   border-radius: 0.75rem;
@@ -57,11 +147,9 @@ body {
   color: rgba(255, 255, 255, 0.4);
 }
 .glass-input:focus {
-  border-color: rgba(244, 114, 182, 0.6);
-  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.25);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
-
-/* Make the native date/time picker icon visible on the dark theme */
 .glass-input::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 0.6;
@@ -70,17 +158,14 @@ body {
 .glass-input::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
-
-/* Gradient brand button */
 .btn-gradient {
-  background-image: linear-gradient(135deg, #ec4899, #f97316);
-  color: #fff;
-  box-shadow: 0 10px 30px -8px rgba(236, 72, 153, 0.5);
-  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  transition: filter 0.2s, transform 0.2s;
 }
 .btn-gradient:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 14px 36px -8px rgba(249, 115, 22, 0.55);
+  filter: brightness(0.9);
 }
 .btn-gradient:disabled {
   opacity: 0.6;
