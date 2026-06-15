@@ -11,7 +11,7 @@ function Layout({ children }) {
           <img
             src="/logo.jpeg"
             alt="ITS Beast Mode"
-            className="logo-mark h-20 w-20 object-contain sm:h-24 sm:w-24"
+            className="h-24 w-24 object-cover sm:h-28 sm:w-28"
           />
         </Link>
       </header>

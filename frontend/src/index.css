@@ -16,12 +16,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* The source logo is a black monogram on white — invert it so it reads as a
-   white mark on the black stage. */
-.logo-mark {
-  filter: invert(1);
-}
-
 /* ---------- Stacked squircle event cards (home) ---------- */
 .event-card {
   position: relative;
