@@ -272,7 +272,7 @@ function EventForm({ event, password, onClose, onSaved, flash }) {
             <Input label="Price" type="number" min="0" value={form.price} onChange={update('price')} required />
             <Input label="Currency" value={form.currency} onChange={update('currency')} required />
           </div>
-          <Input label="Image URL (optional)" value={form.image} onChange={update('image')} />
+          <ImagePicker value={form.image} onChange={(v) => setForm({ ...form, image: v })} flash={flash} />
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-300">
               Description <span className="text-pink-400">*</span>
@@ -296,6 +296,82 @@ function EventForm({ event, password, onClose, onSaved, flash }) {
       </div>
     </div>
     </Portal>
+  );
+}
+
+/* Reads an image File and returns a downscaled JPEG data URL (keeps the DB small). */
+function fileToCompressedDataURL(file, maxSize = 1000, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read the file.'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('That file is not a valid image.'));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSize || height > maxSize) {
+          const scale = Math.min(maxSize / width, maxSize / height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function ImagePicker({ value, onChange, flash }) {
+  const pick = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      flash('Please choose an image file.');
+      return;
+    }
+    try {
+      const dataUrl = await fileToCompressedDataURL(file);
+      onChange(dataUrl);
+    } catch (err) {
+      flash(err.message);
+    } finally {
+      e.target.value = ''; // allow re-picking the same file
+    }
+  };
+
+  return (
+    <div className="block">
+      <span className="mb-1.5 block text-sm font-medium text-slate-300">Image (optional)</span>
+      <div className="flex items-center gap-3">
+        {value ? (
+          <img src={value} alt="" className="h-16 w-16 flex-shrink-0 rounded-xl border border-white/15 object-cover" />
+        ) : (
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl border border-dashed border-white/20 text-xs text-slate-500">
+            None
+          </div>
+        )}
+        <div className="flex flex-1 flex-wrap gap-2">
+          <label className="cursor-pointer rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10">
+            {value ? 'Change image' : 'Upload image'}
+            <input type="file" accept="image/*" onChange={pick} className="hidden" />
+          </label>
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/10"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
