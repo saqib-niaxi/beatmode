@@ -1,12 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { readData, writeData, listAll, listPush, storageMode } from './storage.js';
 
 dotenv.config();
 
 const EVENTS_KEY = 'events';
 const BOOKINGS_KEY = 'bookings';
+const PASSWORD_KEY = 'admin_password'; // stored as "salt:hash" once changed in-app
 
 /* ------------------------------- Config --------------------------------- */
 // Owner WhatsApp number and admin password are configured via env vars.
@@ -16,8 +18,37 @@ function getOwnerPhone() {
   return (process.env.OWNER_PHONE || '').replace(/[^\d]/g, '');
 }
 
-function getAdminPassword() {
+// The env var is the *initial / recovery* password. Once the admin changes
+// their password in-app, a salted scrypt hash is stored and takes precedence.
+// To recover a forgotten password, delete the `admin_password` storage key
+// (or reset ADMIN_PASSWORD) and it falls back to the env var again.
+function getEnvPassword() {
   return process.env.ADMIN_PASSWORD || 'admin123';
+}
+
+/* ------------------------------ Password ------------------------------- */
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+
+// Constant-time comparison of a plaintext password against a stored "salt:hash".
+function verifyHash(password, stored) {
+  const [salt, hash] = String(stored).split(':');
+  if (!salt || !hash) return false;
+  const expected = Buffer.from(hash, 'hex');
+  const actual = crypto.scryptSync(password, salt, 64);
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
+// True if `provided` matches the current admin password (stored hash if set,
+// otherwise the env-var fallback).
+async function verifyAdminPassword(provided) {
+  if (!provided) return false;
+  const stored = await readData(PASSWORD_KEY, null);
+  if (stored) return verifyHash(provided, stored);
+  return provided === getEnvPassword();
 }
 
 /* ------------------------------- App ------------------------------------ */
@@ -27,12 +58,15 @@ app.use(cors());
 app.use(express.json());
 
 // Admin auth middleware: expects password in `x-admin-password` header.
-function requireAdmin(req, res, next) {
-  const provided = req.headers['x-admin-password'];
-  if (!provided || provided !== getAdminPassword()) {
-    return res.status(401).json({ error: 'Unauthorized' });
+async function requireAdmin(req, res, next) {
+  try {
+    if (!(await verifyAdminPassword(req.headers['x-admin-password']))) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    next();
+  } catch {
+    res.status(500).json({ error: 'Auth check failed' });
   }
-  next();
 }
 
 /* ----------------------------- Public API ------------------------------- */
@@ -84,12 +118,33 @@ app.post('/api/bookings', async (req, res) => {
 
 /* ------------------------------ Admin API ------------------------------- */
 
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', async (req, res) => {
   const { password } = req.body || {};
-  if (password && password === getAdminPassword()) {
+  if (await verifyAdminPassword(password)) {
     return res.json({ success: true });
   }
   res.status(401).json({ error: 'Incorrect password' });
+});
+
+// Change the admin password. Auth IS the current-password check below (not the
+// requireAdmin middleware) so a wrong old password returns a clear message
+// instead of a generic 401 "Unauthorized". On success it stores a fresh salted
+// hash that takes precedence over the env var from then on.
+app.post('/api/admin/password', async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+
+  if (!(await verifyAdminPassword(currentPassword))) {
+    return res.status(401).json({ error: 'Your old password is incorrect.' });
+  }
+  if (!newPassword || String(newPassword).length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+  }
+  if (newPassword === currentPassword) {
+    return res.status(400).json({ error: 'New password must be different from the current one.' });
+  }
+
+  await writeData(PASSWORD_KEY, hashPassword(newPassword));
+  res.json({ success: true });
 });
 
 app.get('/api/admin/bookings', requireAdmin, async (req, res) => {

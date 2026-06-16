@@ -4,3 +4,4 @@ node_modules/
 **/.env
 frontend/dist/
 .vercel/
+api/data/admin_password.json

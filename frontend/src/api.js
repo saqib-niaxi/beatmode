@@ -27,6 +27,13 @@ const adminHeaders = (password) => ({ 'x-admin-password': password });
 export const adminLogin = (password) =>
   request('/api/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
 
+export const changeAdminPassword = (currentPassword, newPassword) =>
+  request('/api/admin/password', {
+    method: 'POST',
+    headers: adminHeaders(currentPassword),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
 export const getAdminBookings = (password) =>
   request('/api/admin/bookings', { headers: adminHeaders(password) });
 

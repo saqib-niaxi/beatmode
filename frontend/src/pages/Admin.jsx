@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   adminLogin,
+  changeAdminPassword,
   getAdminBookings,
   getEvents,
   createEvent,
@@ -60,10 +61,21 @@ export default function Admin() {
     );
   }
 
-  return <Dashboard password={password} onLogout={() => { sessionStorage.removeItem('adminPw'); setAuthed(false); }} />;
+  const handlePasswordChanged = (newPw) => {
+    setPassword(newPw);
+    sessionStorage.setItem('adminPw', newPw);
+  };
+
+  return (
+    <Dashboard
+      password={password}
+      onPasswordChanged={handlePasswordChanged}
+      onLogout={() => { sessionStorage.removeItem('adminPw'); setAuthed(false); }}
+    />
+  );
 }
 
-function Dashboard({ password, onLogout }) {
+function Dashboard({ password, onPasswordChanged, onLogout }) {
   const [events, setEvents] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [toast, setToast] = useState('');
@@ -102,7 +114,95 @@ function Dashboard({ password, onLogout }) {
 
       <EventsCard events={events} password={password} onChanged={refresh} flash={flash} />
       <BookingsCard bookings={bookings} />
+      <ChangePasswordCard onPasswordChanged={onPasswordChanged} />
     </div>
+  );
+}
+
+/* -------------------------- Change password ------------------------- */
+
+function ChangePasswordCard({ onPasswordChanged }) {
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(null); // { ok: boolean, message: string }
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setStatus(null);
+    if (next !== confirm) {
+      setStatus({ ok: false, message: 'New passwords do not match.' });
+      return;
+    }
+    setBusy(true);
+    try {
+      await changeAdminPassword(current, next);
+      onPasswordChanged(next); // keep the cached session password in sync
+      setCurrent('');
+      setNext('');
+      setConfirm('');
+      setStatus({ ok: true, message: 'Your password has been changed.' });
+    } catch (err) {
+      // err.message carries the server text, e.g. "Your old password is incorrect."
+      setStatus({ ok: false, message: err.message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="glass mt-8 rounded-3xl p-6 shadow-xl">
+      <h2 className="mb-4 text-lg font-semibold text-white">Change password</h2>
+      <form onSubmit={submit} className="max-w-sm space-y-3">
+        {status && (
+          <p
+            className={`rounded-xl border p-3 text-sm ${
+              status.ok
+                ? 'border-green-400/30 bg-green-400/10 text-green-200'
+                : 'border-red-400/30 bg-red-400/10 text-red-200'
+            }`}
+          >
+            {status.message}
+          </p>
+        )}
+        <input
+          type="password"
+          autoComplete="current-password"
+          value={current}
+          onChange={(e) => setCurrent(e.target.value)}
+          placeholder="Current password"
+          required
+          className="glass-input"
+        />
+        <input
+          type="password"
+          autoComplete="new-password"
+          value={next}
+          onChange={(e) => setNext(e.target.value)}
+          placeholder="New password (min 6 characters)"
+          minLength={6}
+          required
+          className="glass-input"
+        />
+        <input
+          type="password"
+          autoComplete="new-password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          placeholder="Confirm new password"
+          minLength={6}
+          required
+          className="glass-input"
+        />
+        <button
+          disabled={busy}
+          className="btn-gradient w-full rounded-xl py-2.5 font-semibold disabled:opacity-60"
+        >
+          {busy ? 'Updating…' : 'Update password'}
+        </button>
+      </form>
+    </section>
   );
 }
 
